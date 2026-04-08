@@ -1,77 +1,56 @@
-import os
-import tempfile
-from autogen.coding import LocalCommandLineCodeExecutor
+import streamlit as st
 
-class AgentConfig:
-    """Configuration settings for the AutoGen application."""
-    
+class AppConfig:
+    """Handles application configuration and styling."""
     @staticmethod
-    def get_llm_config():
-        return [
-            {
-                "model": "gpt-4.1-nano",
-                "api_key": os.environ.get("OPENAI_API_KEY"),
-                "base_url": os.environ.get("OPENAI_BASE_URL"),
+    def setup_page():
+        st.set_page_config(
+            page_title="AI Stock Analysis",
+            page_icon="📈",
+            layout="wide",
+            initial_sidebar_state="expanded"
+        )
+        st.markdown("""
+        <style>
+            .main-header {
+                font-size: 3rem;
+                font-weight: bold;
+                text-align: center;
+                margin-bottom: 2rem;
+                color: #1f2a44;
+                background: none;
+                -webkit-background-clip: unset;
+                -webkit-text-fill-color: unset;
             }
-        ]
-    
+            .stButton > button {
+                width: 30%;
+                background: #1f2a44;
+                color: white;
+                border: none;
+                padding: 0.75rem;
+                border-radius: 0.5rem;
+                font-weight: bold;
+            }
+            .analysis-container {
+                background-color: #f8f9fa;
+                padding: 1.5rem;
+                border-radius: 0.5rem;
+                border-left: 4px solid #1f2a44;
+                margin: 1rem 0;
+            }
+            .metric-container {
+                background: white;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin: 0.5rem 0;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+
     @staticmethod
-    def get_tools_list():
-        return {
-            "finance_data_fetch": {
-                "type": "function",
-                "function": {
-                    "name": "finance_data_fetch",
-                    "description": "Fetch recent stock information for a ticker symbol",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {"ticker": {"type": "string"}},
-                        "required": ["ticker"],
-                    },
-                },
-            },
-            "technical_analysis_tool": {
-                "type": "function",
-                "function": {
-                    "name": "technical_analysis_tool",
-                    "description": "Perform technical analysis using moving averages and RSI",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {"ticker": {"type": "string"}},
-                        "required": ["ticker"],
-                    },
-                },
-            },
-            "risk_assessment_tool": {
-                "type": "function",
-                "function": {
-                    "name": "risk_assessment_tool",
-                    "description": "Perform risk evaluation using beta, volatility, and dividend yield",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {"ticker": {"type": "string"}},
-                        "required": ["ticker"],
-                    },
-                },
-            },
-            "strategy_signal_tool": {
-                "type": "function",
-                "function": {
-                    "name": "strategy_signal_tool",
-                    "description": "Evaluate trading signals using MACD, RSI, and closing price",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {"ticker": {"type": "string"}},
-                        "required": ["ticker"],
-                    },
-                },
-            },
-        }
-    
-    @staticmethod
-    def get_code_executor_config():
-        temp_dir = tempfile.TemporaryDirectory()
-        return LocalCommandLineCodeExecutor(
-            timeout=30,
-            work_dir=temp_dir.name,
-        ), temp_dir
+    def initialize_session_state():
+        if 'analysis_results' not in st.session_state:
+            st.session_state.analysis_results = {}
+        if 'chat_history' not in st.session_state:
+            st.session_state.chat_history = []
